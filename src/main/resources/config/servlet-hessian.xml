@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>    
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:jee="http://www.springframework.org/schema/jee"  
+    xmlns:tx="http://www.springframework.org/schema/tx"   
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:p="http://www.springframework.org/schema/p"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+     http://www.springframework.org/schema/tx  
+     http://www.springframework.org/schema/tx/spring-tx-4.0.xsd  
+     http://www.springframework.org/schema/jee  
+     http://www.springframework.org/schema/jee/spring-jee-4.0.xsd  
+     http://www.springframework.org/schema/aop  
+     http://www.springframework.org/schema/aop/spring-aop-4.0.xsd  
+     http://www.springframework.org/schema/context  
+     http://www.springframework.org/schema/context/spring-context-4.0.xsd">   
+      
+<!--     <context:annotation-config />   -->
+    <!-- 组件扫描,使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->  
+    <context:component-scan base-package="com.qmmt.edu.remoteservice" />  
+  
+    <!-- 自动装配 -->  
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />       
+    
+    <!-- 预充值活动 --> 
+    <bean name="/qmmt.hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">    
+       <!-- service的ref与HelloServiceImpl中@Service中配置的一致   -->   
+        <property name="service" ref="qmmtApiService" />    
+       <!--  接口的路径  -->   
+        <property name="serviceInterface" value="com.qmmt.edu.remoteservice.QmmtApiService" />    
+    </bean>   
+
+
+</beans>  

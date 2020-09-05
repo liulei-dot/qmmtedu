@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task-4.0.xsd"
+	default-autowire="byName">
+	
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/qm_edu?characterEncoding=UTF-8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Iloveqmmt2099!"/>
+    	<property name="maxActive" value="10" />
+		<property name="initialSize" value="1" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="1" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="50" />
+		<property name="maxOpenPreparedStatements" value="100" />
+		<property name="proxyFilters">
+			<list>
+				<ref bean="statFilter" />
+				<ref bean="logFilter" />
+			</list>
+		</property>
+	</bean>
+
+	
+	
+	<bean id="statFilter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+		<property name="statementExecutableSqlLogEnable" value="false" />
+		<property name="dataSourceLogEnabled" value="false" />
+	</bean>
+	<bean id="logFilter" class="com.alibaba.druid.filter.stat.StatFilter">
+		<property name="slowSqlMillis" value="50" />
+		<property name="logSlowSql" value="false" />
+		<property name="mergeSql" value="true" />
+	</bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+     <tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<context:component-scan base-package="com.qmmt.edu.service" />
+	
+	<!-- Enables the Spring Task @Scheduled programming model -->
+	<task:annotation-driven/><!-- 用定时器注解  -->
+    <context:component-scan base-package="com.qmmt.edu.timer" />
+
+    <context:annotation-config />
+
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:/config/mybatis-config.xml"></property>
+		<property name="typeAliasesPackage" value="com.qmmt.edu.persistence.po"></property>
+		<property name="mapperLocations" value="classpath*:/sqlmapper/*.xml"></property>
+    </bean>
+
+    <bean name="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.qmmt.edu.persistence.dao"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		
+	</bean>
+
+</beans>  
